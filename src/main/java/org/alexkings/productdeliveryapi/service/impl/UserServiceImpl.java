@@ -12,6 +12,7 @@ import org.alexkings.productdeliveryapi.repository.BindCarriersToPlaceRepository
 import org.alexkings.productdeliveryapi.repository.PlaceRepository;
 import org.alexkings.productdeliveryapi.repository.UserRepository;
 import org.alexkings.productdeliveryapi.service.UserService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +25,13 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder delegatingPasswordEncoder;
+
     private final PlaceRepository placeRepository;
     private final BindCarriersToPlaceRepository bindCarriersToPlaceRepository;
+    @Qualifier("passwordEncoderMap")
     private final Map<String, PasswordEncoder> passwordEncoders;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder delegatingPasswordEncoder, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository, Map<String, PasswordEncoder> passwordEncoders) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder delegatingPasswordEncoder, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository, @Qualifier("passwordEncoderMap")Map<String, PasswordEncoder> passwordEncoders) {
         this.userRepository = userRepository;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.placeRepository = placeRepository;
@@ -114,12 +117,12 @@ public class UserServiceImpl implements UserService {
         e.setLastname(userDto.getLastName());
         e.setUsername(userDto.getUserName());
         e.setEmail(userDto.getEmail());
-        e.setPassword("{bcrypt}" + passwordEncoders.get("BCRYPT").encode(userDto.getPassword()));
+        e.setPassword("{bcrypt}" + passwordEncoders.get("bcrypt").encode(userDto.getPassword()));
         e.setImage(userDto.getImage());
         e.setCreatedDate(Date.from(Instant.now()));
         e.setEnabled(true);
         e.setUpdateDate(Date.from(Instant.now()));
-        e.setEncodingType("BCRYPT");
+        e.setEncodingType("bcrypt");
         return e;
     }
 
@@ -153,8 +156,8 @@ public class UserServiceImpl implements UserService {
         user.setFirstname(registerReq.getFirstName());
         user.setLastname(registerReq.getLastName());
         user.setEmail(registerReq.getEmail());
-        user.setPassword("{bcrypt}" + passwordEncoders.get("BCRYPT").encode(registerReq.getPassword()));
-        user.setEncodingType("BCRYPT");
+        user.setPassword("{bcrypt}" + passwordEncoders.get("bcrypt").encode(registerReq.getPassword()));
+        user.setEncodingType("bcrypt");
         user.setRole("USER");
         user.setCreatedDate(Date.from(Instant.now()));
         user.setUpdateDate(Date.from(Instant.now()));

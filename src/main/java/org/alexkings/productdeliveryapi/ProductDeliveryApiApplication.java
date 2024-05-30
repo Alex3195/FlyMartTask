@@ -1,5 +1,6 @@
 package org.alexkings.productdeliveryapi;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,18 +20,19 @@ public class ProductDeliveryApiApplication {
     }
 
     @Bean
+    @Qualifier("passwordEncoderMap")
     public Map<String, PasswordEncoder> passwordEncoders() {
         Map<String, PasswordEncoder> encoders = new HashMap<>();
-        encoders.put("BCRYPT", new BCryptPasswordEncoder());
-        encoders.put("SCRYPT", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
+        encoders.put("scrypt", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
         return encoders;
     }
     @Bean
     public PasswordEncoder delegatingPasswordEncoder() {
-        String idForEncode = "BCRYPT"; // Default encoder
+        String idForEncode = "bcrypt"; // Default encoder
         Map<String, PasswordEncoder> encoders = new HashMap<>();
-        encoders.put("BCRYPT", new BCryptPasswordEncoder());
-        encoders.put("SCRYPT", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
+        encoders.put("scrypt", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
 
         return new DelegatingPasswordEncoder(idForEncode, encoders);
     }
