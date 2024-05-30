@@ -9,6 +9,8 @@ import org.alexkings.productdeliveryapi.service.RegionService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +53,28 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public void deleteRegion(Long id) {
         regionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<RegionDto> getRegionsAndPlaces() {
+        List<Region> regions = regionRepository.findAll();
+        List<RegionDto> result = regions.stream().sorted(new Comparator<Region>() {
+            @Override
+            public int compare(Region o1, Region o2) {
+                return Math.toIntExact(o2.getId() - o1.getId());
+            }
+        }).map(i -> {
+            List<Place> places =
+                    i.getPlaces().stream().sorted(new Comparator<Place>() {
+                        @Override
+                        public int compare(Place o1, Place o2) {
+                            return Math.toIntExact(o1.getId() - o2.getId());
+                        }
+                    }).toList();
+            i.setPlaces(places);
+            return regionEntityToDto(i);
+        }).toList();
+        return List.of();
     }
 
     private RegionDto regionEntityToDto(Region region) {

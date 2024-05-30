@@ -1,5 +1,6 @@
 package org.alexkings.productdeliveryapi.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.alexkings.productdeliveryapi.model.RegionDto;
 import org.alexkings.productdeliveryapi.service.RegionService;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +51,10 @@ public class RegionController {
     public ResponseEntity<Void> deleteRegion(@PathVariable Long id) {
         regionService.deleteRegion(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/getRegionsAndPlaces")
+    public ResponseEntity<List<RegionDto>> getAllRegionsAndPlaces(HttpServletRequest request) {
+        return ResponseEntity.ok(regionService.getRegionsAndPlaces());
     }
 }

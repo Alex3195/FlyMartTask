@@ -14,4 +14,6 @@ public interface RegionService {
     RegionDto updateRegion(Long id, RegionDto updatedRegion);
 
     void deleteRegion(Long id);
+
+    List<RegionDto> getRegionsAndPlaces();
 }
