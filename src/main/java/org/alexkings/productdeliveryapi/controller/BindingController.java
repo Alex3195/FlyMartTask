@@ -2,6 +2,7 @@ package org.alexkings.productdeliveryapi.controller;
 
 import org.alexkings.productdeliveryapi.service.BindService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +20,14 @@ public class BindingController {
     }
 
     @PostMapping("/bind-role-to-permission")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     private ResponseEntity<?> bindRoleToPermission(@RequestParam("role") Long roleId, @RequestParam("permission") List<Long> permissionIds) {
         bindService.bindPermissionsToRole(roleId, permissionIds);
         return ResponseEntity.ok().body("Success");
     }
 
     @PostMapping("/bind-place-to-carrier")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     private ResponseEntity<?> bindPlaceToCarrier(@RequestParam("carrier") Long carrier, @RequestParam("places") List<Long> places) {
         bindService.bindPlacesToCarrier(carrier, places);
         return ResponseEntity.ok().body("Success");

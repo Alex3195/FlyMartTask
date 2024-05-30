@@ -1,5 +1,6 @@
 package org.alexkings.productdeliveryapi.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.alexkings.productdeliveryapi.model.TransactionDto;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface TransactionService {
     TransactionDto updateTransaction(Long id, TransactionDto updatedTransaction);
 
     void deleteTransaction(Long id);
+
+    void evaluateTransaction(String transactionService, Integer score);
+
+    List<TransactionDto> getUserTransactions(HttpServletRequest request);
 }

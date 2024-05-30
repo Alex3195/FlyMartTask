@@ -1,7 +1,10 @@
 package org.alexkings.productdeliveryapi.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.alexkings.productdeliveryapi.auth.JwtUtil;
 import org.alexkings.productdeliveryapi.entities.*;
 import org.alexkings.productdeliveryapi.model.TransactionDto;
+import org.alexkings.productdeliveryapi.model.UserDto;
 import org.alexkings.productdeliveryapi.repository.*;
 import org.alexkings.productdeliveryapi.service.TransactionService;
 import org.springframework.stereotype.Service;
@@ -21,14 +24,16 @@ public class TransactionServiceImpl implements TransactionService {
     private final PlaceRepository placeRepository;
     private final BindCarriersToPlaceRepository bindCarriersToPlaceRepository;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, RequestRepository requestRepository, OfferRepository offerRepository, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository, UserRepository userRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, RequestRepository requestRepository, OfferRepository offerRepository, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository, UserRepository userRepository, JwtUtil jwtUtil) {
         this.transactionRepository = transactionRepository;
         this.requestRepository = requestRepository;
         this.offerRepository = offerRepository;
         this.placeRepository = placeRepository;
         this.bindCarriersToPlaceRepository = bindCarriersToPlaceRepository;
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     public TransactionDto createTransaction(TransactionDto transaction) {
@@ -83,6 +88,22 @@ public class TransactionServiceImpl implements TransactionService {
 
     public void deleteTransaction(Long id) {
         transactionRepository.deleteById(id);
+    }
+
+    @Override
+    public void evaluateTransaction(String transactionCode, Integer score) {
+        Transaction e = transactionRepository.findByTransactionCode(transactionCode);
+        e.setScore(score);
+        e.setUpdateDate(Date.from(Instant.now()));
+        transactionRepository.save(e);
+    }
+
+    @Override
+    public List<TransactionDto> getUserTransactions(HttpServletRequest request) {
+        UserDto user = jwtUtil.parseToken(request);
+        Requests requests = requestRepository.findByCreatedBy(user.getId());
+        List<Transaction> list = transactionRepository.findByRequestCode(requests.getRequestCode());
+        return list.stream().map(this::entityToDto).toList();
     }
 
     private TransactionDto entityToDto(Transaction transaction) {

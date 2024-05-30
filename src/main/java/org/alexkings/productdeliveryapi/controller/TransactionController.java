@@ -1,5 +1,6 @@
 package org.alexkings.productdeliveryapi.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.alexkings.productdeliveryapi.entities.Transaction;
 import org.alexkings.productdeliveryapi.model.TransactionDto;
 import org.alexkings.productdeliveryapi.service.TransactionService;
@@ -51,5 +52,14 @@ public class TransactionController {
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/evaluateTransaction/{transactionCode}/{score}")
+    public ResponseEntity<Void> evaluateTransaction(@PathVariable String transactionCode, @PathVariable Integer score) {
+        transactionService.evaluateTransaction(transactionCode,score);
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/getUserTransactions")
+    public ResponseEntity<List<TransactionDto>> getUserTransactions(HttpServletRequest request) {
+        return ResponseEntity.ok(transactionService.getUserTransactions(request));
     }
 }

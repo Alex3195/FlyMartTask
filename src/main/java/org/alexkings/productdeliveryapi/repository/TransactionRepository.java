@@ -8,4 +8,8 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByRequestCodeAndOfferCode(String requestCode, String offerCode);
 
+    Transaction findByTransactionCode(String transactionCode);
+
+    List<Transaction> findByRequestCode(String requestCode);
+
 }
