@@ -31,12 +31,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
-    private final Map<String, PasswordEncoder> passwordEncoders;
+    private final PasswordEncoder delegatingPasswordEncoder;
 
-    public CustomUserDetailsService(UserRepository userRepository, RolesRepository rolesRepository, Map<String, PasswordEncoder> passwordEncoders) {
+    public CustomUserDetailsService(UserRepository userRepository, RolesRepository rolesRepository, PasswordEncoder delegatingPasswordEncoder) {
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
-        this.passwordEncoders = passwordEncoders;
+        this.delegatingPasswordEncoder = delegatingPasswordEncoder;
     }
 
     @Override
@@ -56,14 +56,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                 Users defaultUser = new Users();
                 defaultUser.setUsername(email);
                 defaultUser.setRole("ADMIN");
-                defaultUser.setPassword(new BCryptPasswordEncoder().encode("Alex!123"));
+                defaultUser.setPassword(delegatingPasswordEncoder.encode("Alex!123"));
                 defaultUser.setEncodingType("BCRYPT"); // Ensure this matches the key in your encoder map
                 return defaultUser;
             }
             throw new UsernameNotFoundException(email);
         });
-        PasswordEncoder encoder = new DelegatingPasswordEncoder(user.getEncodingType(), passwordEncoders);
-        if (encoder == null) {
+        if (delegatingPasswordEncoder == null) {
             throw new IllegalArgumentException("No encoder found for encryption type: " + user.getEncodingType());
         }
         RoleDto role = new RoleDto();

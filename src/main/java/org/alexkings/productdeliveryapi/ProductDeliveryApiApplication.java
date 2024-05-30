@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 
@@ -23,6 +24,15 @@ public class ProductDeliveryApiApplication {
         encoders.put("BCRYPT", new BCryptPasswordEncoder());
         encoders.put("SCRYPT", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
         return encoders;
+    }
+    @Bean
+    public PasswordEncoder delegatingPasswordEncoder() {
+        String idForEncode = "BCRYPT"; // Default encoder
+        Map<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put("BCRYPT", new BCryptPasswordEncoder());
+        encoders.put("SCRYPT", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
+
+        return new DelegatingPasswordEncoder(idForEncode, encoders);
     }
 
 }

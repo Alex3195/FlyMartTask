@@ -23,15 +23,17 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final Map<String, PasswordEncoder> passwordEncoder;
+    private final PasswordEncoder delegatingPasswordEncoder;
     private final PlaceRepository placeRepository;
     private final BindCarriersToPlaceRepository bindCarriersToPlaceRepository;
+    private final Map<String, PasswordEncoder> passwordEncoders;
 
-    public UserServiceImpl(UserRepository userRepository, Map<String, PasswordEncoder> passwordEncoder, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder delegatingPasswordEncoder, PlaceRepository placeRepository, BindCarriersToPlaceRepository bindCarriersToPlaceRepository, Map<String, PasswordEncoder> passwordEncoders) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.placeRepository = placeRepository;
         this.bindCarriersToPlaceRepository = bindCarriersToPlaceRepository;
+        this.passwordEncoders = passwordEncoders;
     }
 
     @Override
@@ -100,9 +102,9 @@ public class UserServiceImpl implements UserService {
         Place place = placeRepository.findByName(name);
         if (place != null) {
             List<BindCarriersToPlaces> bindCarriersToPlaces = bindCarriersToPlaceRepository.findByPlaceIdAndRegionId(place.getId(), place.getRegion().getId());
-
+            List<Users> users = userRepository.findByIdIn(bindCarriersToPlaces.stream().map(BindCarriersToPlaces::getCarrierId).toList());
+            return users.stream().map(this::entityToDto).toList();
         }
-
         return List.of();
     }
 
@@ -112,7 +114,7 @@ public class UserServiceImpl implements UserService {
         e.setLastname(userDto.getLastName());
         e.setUsername(userDto.getUserName());
         e.setEmail(userDto.getEmail());
-        e.setPassword(passwordEncoder.get("BCRYPT").encode(userDto.getPassword()));
+        e.setPassword("{bcrypt}" + passwordEncoders.get("BCRYPT").encode(userDto.getPassword()));
         e.setImage(userDto.getImage());
         e.setCreatedDate(Date.from(Instant.now()));
         e.setEnabled(true);
@@ -138,7 +140,7 @@ public class UserServiceImpl implements UserService {
         user.setLastname(signInReq.getLastName());
         user.setEmail(signInReq.getEmail());
         user.setEncodingType(signInReq.getEncodingType());
-        user.setPassword(passwordEncoder.get(signInReq.getEncodingType()).encode(signInReq.getPassword()));
+        user.setPassword("{" + signInReq.getEncodingType().toLowerCase() + "}" + passwordEncoders.get(signInReq.getEncodingType()).encode(signInReq.getPassword()));
         user.setRole("ADMIN");
         user.setCreatedDate(Date.from(Instant.now()));
         user.setUpdateDate(Date.from(Instant.now()));
@@ -151,7 +153,7 @@ public class UserServiceImpl implements UserService {
         user.setFirstname(registerReq.getFirstName());
         user.setLastname(registerReq.getLastName());
         user.setEmail(registerReq.getEmail());
-        user.setPassword(passwordEncoder.get("BCRYPT").encode(registerReq.getPassword()));
+        user.setPassword("{bcrypt}" + passwordEncoders.get("BCRYPT").encode(registerReq.getPassword()));
         user.setEncodingType("BCRYPT");
         user.setRole("USER");
         user.setCreatedDate(Date.from(Instant.now()));
