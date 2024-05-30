@@ -92,6 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionDto.setRequestCode(transaction.getRequestCode());
         transactionDto.setOfferCode(transaction.getOfferCode());
         transactionDto.setScore(transaction.getScore());
+        transactionDto.setProductCode(transaction.getProductCode());
         transactionDto.setDeliveryLocation(transaction.getDeliveryLocation());
         transactionDto.setPickupLocation(transaction.getPickupLocation());
         return transactionDto;
@@ -104,6 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setRequestCode(transactionDto.getRequestCode());
         transaction.setOfferCode(transactionDto.getOfferCode());
         transaction.setScore(transactionDto.getScore());
+        transaction.setProductCode(transactionDto.getProductCode());
         transaction.setDeliveryLocation(transactionDto.getDeliveryLocation());
         transaction.setPickupLocation(transactionDto.getPickupLocation());
         if (transaction.getId() == null)

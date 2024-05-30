@@ -13,6 +13,7 @@ public class TransactionDto {
     private String carrierUsername;
     private String requestCode;
     private String offerCode;
+    private String productCode;
     private String deliveryLocation;
     private String pickupLocation;
     private int score;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/statistics")
@@ -24,4 +25,11 @@ public class StatisticsController {
     public ResponseEntity<List<StatisticsDto>> getDeliveryRegionsPerNT() {
         return ResponseEntity.ok().body(statisticsService.getStatistics());
     }
+
+    @GetMapping("/numberOfTransactionsPerProduct)")
+    @PreAuthorize("hasAnyRole('STATISTICS')")
+    public ResponseEntity<List<Map<String, Object>>> getNumberOfTransactionsPerProduct() {
+        return ResponseEntity.ok().body(statisticsService.getNumberOfTransactionsPerProduct());
+    }
+
 }

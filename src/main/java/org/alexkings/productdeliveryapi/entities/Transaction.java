@@ -33,6 +33,9 @@ public class Transaction {
     @Column(name = "delivery_location")
     private String deliveryLocation;
 
+    @Column(name = "product_code")
+    private String productCode;
+
     @Column(name = "_pickup_location")
     private String pickupLocation;
 
